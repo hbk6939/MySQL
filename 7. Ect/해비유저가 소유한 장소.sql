@@ -1,0 +1,71 @@
+-- 공간을 둘 이상 등록한 사람을 "헤비 유저"라고 부릅니다. 
+-- 헤비 유저가 등록한 공간의 정보를 아이디 순으로 조회
+
+-- CROSS JOIN 활용법
+SELECT
+	DISTINCT 
+    A.ID,
+	A.NAME,
+	A.HOST_ID
+FROM
+	PLACES AS A,
+	PLACES AS B
+WHERE
+	A.ID != B.ID
+	AND A.HOST_ID = B.HOST_ID
+ORDER BY
+	A.ID;
+
+
+-- 상관서브쿼리 사용법
+SELECT
+	ID,
+	NAME,
+	HOST_ID
+FROM PLACES A
+WHERE
+	(
+	SELECT COUNT(HOST_ID) AS count
+	FROM PLACES B
+	WHERE A.HOST_ID = B.HOST_ID
+	) > 1
+ORDER BY 1;
+
+
+-- 상관서브쿼리 HAVING 사용
+SELECT
+	ID,
+	NAME,
+	HOST_ID
+FROM PLACES
+WHERE
+	HOST_ID IN (
+	SELECT HOST_ID
+	FROM PLACES
+	GROUP BY HOST_ID
+	HAVING COUNT(HOST_ID) > 1
+    )
+ORDER BY ID;
+
+
+-- 내 원래 답
+WITH myCTE AS
+(
+SELECT
+	ID,
+	HOST_ID,
+	count(HOST_ID)
+FROM PLACES
+GROUP BY 2
+HAVING count(HOST_ID) > 1
+)
+SELECT
+	p.id,
+	p.name,
+	p.host_id
+FROM places p
+LEFT JOIN myCTE m
+        ON
+	p.HOST_ID = m.HOST_ID
+WHERE m.id IS NOT NULL
+ORDER BY id;

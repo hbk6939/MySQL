@@ -1,0 +1,5 @@
+-- 동물 보호소에 들어온 동물 중 젊은 동물의 아이디와 이름을 조회
+SELECT ANIMAL_ID, name
+FROM ANIMAL_INS
+WHERE INTAKE_CONDITION NOT LIKE 'aged'
+ORDER BY ANIMAL_ID;
